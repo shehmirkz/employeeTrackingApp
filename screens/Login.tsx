@@ -1,15 +1,16 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
   StyleSheet,
   FlatList,
   TextInput,
-  TouchableOpacity,
+  Button,
 } from 'react-native';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 import {Link} from '@react-navigation/native';
+import auth from '@react-native-firebase/auth';
 
 const loginSchema = Yup.object({
   email: Yup.string().email().required('ex: abc@gmail.com'),
@@ -17,6 +18,10 @@ const loginSchema = Yup.object({
 });
 
 const Login = ({navigation}) => {
+  const [logedIn, setLogedIn] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
+  const [userPassword, setUserPassword] = useState('');
+
   return (
     <View style={styles.mainContainer}>
       <View>
@@ -27,12 +32,27 @@ const Login = ({navigation}) => {
       </View>
 
       <Formik
-        initialValues={{email: 'email', password: 'password'}}
+        initialValues={{email: userEmail, password: userPassword}}
         validationSchema={loginSchema}
-        onSubmit={values => {
-          navigation.naigate('Signup');
+        onSubmit={async values => {
+          const response = await auth()
+            .signInWithEmailAndPassword(values.email, values.password)
+            .then(resp => {
+              if (resp) {
+                alert('Welcome, you are logged in');
+              }
+            })
+            .catch(err => {
+              if (err) {
+                alert('email or passsword is invalid!');
+              }
+            });
+
+          // TODO: we need to navigate welcome screen after init.
+          // navigation.navigate('Signup');
+          console.log('Response', response);
         }}>
-        {({values, handleChange, handleSubmit, errors}) => {
+        {({values, handleChange, handleSubmit, handleBlur}) => {
           return (
             <>
               <FlatList
@@ -48,6 +68,7 @@ const Login = ({navigation}) => {
                           style={styles.inputField}
                           placeholder="Enter email"
                           value={values.email}
+                          onBlur={handleBlur('email')}
                           onChangeText={handleChange('email')}
                         />
                       </View>
@@ -58,6 +79,7 @@ const Login = ({navigation}) => {
                           placeholder="Enter password"
                           secureTextEntry={true}
                           value={values.password}
+                          onBlur={handleBlur('password')}
                           onChangeText={handleChange('password')}
                         />
                       </View>
@@ -71,11 +93,7 @@ const Login = ({navigation}) => {
                 }}
               />
               <View style={styles.loginContainer}>
-                <TouchableOpacity
-                  style={styles.loginButton}
-                  onPress={() => handleSubmit}>
-                  <Text style={styles.loginText}>LogIn</Text>
-                </TouchableOpacity>
+                <Button title="Sign In" onPress={() => handleSubmit()} />
               </View>
             </>
           );
@@ -126,16 +144,8 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   loginContainer: {
-    height: 60,
+    height: 100,
     marginBottom: 30,
-  },
-  loginButton: {
-    backgroundColor: '#5DADE2',
-    height: 60,
-    borderRadius: 4,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   loginText: {
     color: '#fff',
