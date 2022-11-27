@@ -8,6 +8,7 @@ import {
   Button,
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 
@@ -18,11 +19,16 @@ const SignupSchema = Yup.object({
   confirmPassword: Yup.string().required(),
 });
 
-const SignUp = ({navigation}) => {
-  const [userName, setUserName] = useState('');
-  const [userEmail, setUserEmail] = useState('');
-  const [userPassword, setUserPassword] = useState('');
-  const [userConfirmPassword, setUserConfirmPassword] = useState('');
+type RootStackParamList = {
+  Login: undefined;
+  Signup: undefined;
+};
+
+const SignUp = ({navigation}: NativeStackScreenProps<RootStackParamList>) => {
+  const [userName, setUserName] = useState<string>('');
+  const [userEmail, setUserEmail] = useState<string>('');
+  const [userPassword, setUserPassword] = useState<string>('');
+  const [userConfirmPassword, setUserConfirmPassword] = useState<string>('');
 
   return (
     <View style={styles.mainContainer}>

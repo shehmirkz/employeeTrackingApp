@@ -6,10 +6,12 @@ import {
   FlatList,
   TextInput,
   Button,
+  Alert,
 } from 'react-native';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 import {Link} from '@react-navigation/native';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import auth from '@react-native-firebase/auth';
 
 const loginSchema = Yup.object({
@@ -17,10 +19,16 @@ const loginSchema = Yup.object({
   password: Yup.string().required('must be 8 characters'),
 });
 
-const Login = ({navigation}) => {
-  const [logedIn, setLogedIn] = useState(false);
-  const [userEmail, setUserEmail] = useState('');
-  const [userPassword, setUserPassword] = useState('');
+type RootStackParamList = {
+  Login: undefined;
+  Signup: undefined;
+  Welcome: undefined;
+};
+
+const Login = ({navigation}: NativeStackScreenProps<RootStackParamList>) => {
+  const [logedIn, setLogedIn] = useState<boolean>(false);
+  const [userEmail, setUserEmail] = useState<string>('');
+  const [userPassword, setUserPassword] = useState<string>('');
 
   return (
     <View style={styles.mainContainer}>
@@ -39,18 +47,18 @@ const Login = ({navigation}) => {
             .signInWithEmailAndPassword(values.email, values.password)
             .then(resp => {
               if (resp) {
-                alert('Welcome, you are logged in');
+                Alert.alert('Welcome, you are logged in');
               }
             })
             .catch(err => {
               if (err) {
-                alert('email or passsword is invalid!');
+                Alert.alert('email or passsword is invalid!');
               }
             });
-
           // TODO: we need to navigate welcome screen after init.
-          // navigation.navigate('Signup');
+          navigation.navigate('Welcome');
           console.log('Response', response);
+          console.log('Navigation', navigation);
         }}>
         {({values, handleChange, handleSubmit, handleBlur}) => {
           return (
