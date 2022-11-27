@@ -1,12 +1,13 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
   StyleSheet,
   FlatList,
   TextInput,
-  TouchableOpacity,
+  Button,
 } from 'react-native';
+import auth from '@react-native-firebase/auth';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 
@@ -17,7 +18,12 @@ const SignupSchema = Yup.object({
   confirmPassword: Yup.string().required(),
 });
 
-const SignUp = () => {
+const SignUp = ({navigation}) => {
+  const [userName, setUserName] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+  const [userPassword, setUserPassword] = useState('');
+  const [userConfirmPassword, setUserConfirmPassword] = useState('');
+
   return (
     <View style={styles.mainContainer}>
       <View>
@@ -29,13 +35,20 @@ const SignUp = () => {
 
       <Formik
         initialValues={{
-          name: '',
-          email: '',
-          password: '',
-          confirmPassword: '',
+          name: userName,
+          email: userEmail,
+          password: userPassword,
+          confirmPassword: userConfirmPassword,
         }}
         validationSchema={SignupSchema}
-        onSubmit={values => console.log(values)}>
+        onSubmit={async values => {
+          const response = await auth().createUserWithEmailAndPassword(
+            values.email,
+            values.password,
+          );
+          navigation.navigate('Login');
+          console.log('Response', response);
+        }}>
         {({values, handleChange, handleSubmit}) => {
           return (
             <>
@@ -47,7 +60,6 @@ const SignUp = () => {
                   return (
                     <View>
                       <View>
-                        {/* <Text style={styles.labels}>Enter name</Text> */}
                         <TextInput
                           style={styles.inputField}
                           placeholder="Enter name"
@@ -56,7 +68,6 @@ const SignUp = () => {
                         />
                       </View>
                       <View>
-                        {/* <Text style={styles.labels}>Enter email</Text> */}
                         <TextInput
                           style={styles.inputField}
                           placeholder="Enter email"
@@ -65,7 +76,6 @@ const SignUp = () => {
                         />
                       </View>
                       <View>
-                        {/* <Text style={styles.labels}>Enter password</Text> */}
                         <TextInput
                           style={styles.inputField}
                           placeholder="Enter password"
@@ -75,7 +85,6 @@ const SignUp = () => {
                         />
                       </View>
                       <View>
-                        {/* <Text style={styles.labels}>Confirm password</Text> */}
                         <TextInput
                           style={styles.inputField}
                           placeholder="Confirm password"
@@ -89,11 +98,7 @@ const SignUp = () => {
                 }}
               />
               <View style={styles.loginContainer}>
-                <TouchableOpacity
-                  style={styles.loginButton}
-                  onPress={() => handleSubmit}>
-                  <Text style={styles.loginText}>Sign Up</Text>
-                </TouchableOpacity>
+                <Button title="Sign Up" onPress={() => handleSubmit()} />
               </View>
             </>
           );
@@ -147,14 +152,6 @@ const styles = StyleSheet.create({
   loginContainer: {
     height: 60,
     marginBottom: 30,
-  },
-  loginButton: {
-    backgroundColor: '#5DADE2',
-    height: 60,
-    borderRadius: 4,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   loginText: {
     color: '#fff',
