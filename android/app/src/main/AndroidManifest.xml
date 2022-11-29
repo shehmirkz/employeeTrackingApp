@@ -22,5 +22,9 @@
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
       </activity>
+      <!-- Google Key is free version, it is restricted & not working sometimes-->
+            <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyD5-QnYnkgyHCqpoTLYD69p8E47Jkej5gE"/>
     </application>
 </manifest>
