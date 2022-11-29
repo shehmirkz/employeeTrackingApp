@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
-import {Link} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import auth from '@react-native-firebase/auth';
 
@@ -26,7 +25,6 @@ type RootStackParamList = {
 };
 
 const Login = ({navigation}: NativeStackScreenProps<RootStackParamList>) => {
-  const [logedIn, setLogedIn] = useState<boolean>(false);
   const [userEmail, setUserEmail] = useState<string>('');
   const [userPassword, setUserPassword] = useState<string>('');
 
@@ -46,21 +44,21 @@ const Login = ({navigation}: NativeStackScreenProps<RootStackParamList>) => {
           const response = await auth()
             .signInWithEmailAndPassword(values.email, values.password)
             .then(resp => {
+              setUserEmail(''), setUserPassword('');
               if (resp) {
                 Alert.alert('Welcome, you are logged in');
+                navigation.navigate('Welcome');
               }
             })
             .catch(err => {
               if (err) {
-                Alert.alert('email or passsword is invalid!');
+                Alert.alert(
+                  'email or passsword is invalid! Please register & go to Signup',
+                );
               }
             });
-          // TODO: we need to navigate welcome screen after init.
-          navigation.navigate('Welcome');
-          console.log('Response', response);
-          console.log('Navigation', navigation);
         }}>
-        {({values, handleChange, handleSubmit, handleBlur}) => {
+        {({values, handleChange, handleSubmit}) => {
           return (
             <>
               <FlatList
@@ -76,7 +74,6 @@ const Login = ({navigation}: NativeStackScreenProps<RootStackParamList>) => {
                           style={styles.inputField}
                           placeholder="Enter email"
                           value={values.email}
-                          onBlur={handleBlur('email')}
                           onChangeText={handleChange('email')}
                         />
                       </View>
@@ -87,21 +84,21 @@ const Login = ({navigation}: NativeStackScreenProps<RootStackParamList>) => {
                           placeholder="Enter password"
                           secureTextEntry={true}
                           value={values.password}
-                          onBlur={handleBlur('password')}
                           onChangeText={handleChange('password')}
                         />
-                      </View>
-                      <View style={styles.signUpTextContainer}>
-                        <Text style={styles.signUpText}>
-                          <Link to={'/Signup'}>New User: Sign up here</Link>
-                        </Text>
                       </View>
                     </View>
                   );
                 }}
               />
-              <View style={styles.loginContainer}>
+              <View style={styles.loginButtonContainer}>
                 <Button title="Sign In" onPress={() => handleSubmit()} />
+              </View>
+              <View style={styles.loginButtonContainer}>
+                <Button
+                  title="Sign Up"
+                  onPress={() => navigation.navigate('Signup')}
+                />
               </View>
             </>
           );
@@ -151,9 +148,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     borderRadius: 4,
   },
-  loginContainer: {
-    height: 100,
-    marginBottom: 30,
+  loginButtonContainer: {
+    height: 50,
+    marginBottom: 10,
   },
   loginText: {
     color: '#fff',
