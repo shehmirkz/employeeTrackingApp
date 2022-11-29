@@ -22,6 +22,7 @@ const SignupSchema = Yup.object({
 type RootStackParamList = {
   Login: undefined;
   Signup: undefined;
+  Welcome: undefined;
 };
 
 const SignUp = ({navigation}: NativeStackScreenProps<RootStackParamList>) => {
@@ -52,6 +53,9 @@ const SignUp = ({navigation}: NativeStackScreenProps<RootStackParamList>) => {
             values.email,
             values.password,
           );
+          setUserName('');
+          setUserEmail('');
+          setUserPassword('');
           navigation.navigate('Login');
           console.log('Response', response);
         }}>
